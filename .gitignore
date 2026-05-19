@@ -1,0 +1,5 @@
+*.parquet
+
+__pychache__/
+*.py[codz]
+*$py.class

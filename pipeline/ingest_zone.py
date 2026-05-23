@@ -14,6 +14,7 @@ from tqdm.auto import tqdm
 @click.option('--pg-db', default='ny_taxi', help='PostgreSQL database name')
 @click.option('--target-table', default='taxi_zone_lookup', help='Target table name')
 @click.option('--chunksize', default=100000, type=int, help='Chunk size for reading CSV')
+
 def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table, chunksize):
     """Ingest NYC taxi zone lookup data into PostgreSQL database."""
     

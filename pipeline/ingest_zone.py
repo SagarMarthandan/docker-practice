@@ -6,56 +6,25 @@ import pandas as pd
 from sqlalchemy import create_engine
 from tqdm.auto import tqdm
 
-# --- Global Configuration ---
-
-dtype = {
-    "VendorID": "Int64",
-    "passenger_count": "Int64",
-    "trip_distance": "float64",
-    "RatecodeID": "Int64",
-    "store_and_fwd_flag": "string",
-    "PULocationID": "Int64",
-    "DOLocationID": "Int64",
-    "payment_type": "Int64",
-    "fare_amount": "float64",
-    "extra": "float64",
-    "mta_tax": "float64",
-    "tip_amount": "float64",
-    "tolls_amount": "float64",
-    "improvement_surcharge": "float64",
-    "total_amount": "float64",
-    "congestion_surcharge": "float64"
-}
-
-parse_dates = [
-    "tpep_pickup_datetime",
-    "tpep_dropoff_datetime"
-]
-
 @click.command()
 @click.option('--pg-user', default='root', help='PostgreSQL user')
 @click.option('--pg-pass', default='root', help='PostgreSQL password')
 @click.option('--pg-host', default='localhost', help='PostgreSQL host')
 @click.option('--pg-port', default=5432, type=int, help='PostgreSQL port')
 @click.option('--pg-db', default='ny_taxi', help='PostgreSQL database name')
-@click.option('--year', default=2022, type=int, help='Year of the data')
-@click.option('--month', default=1, type=int, help='Month of the data')
-@click.option('--target-table', default='yellow_taxi_data', help='Target table name')
+@click.option('--target-table', default='taxi_zone_lookup', help='Target table name')
 @click.option('--chunksize', default=100000, type=int, help='Chunk size for reading CSV')
-def run(pg_user, pg_pass, pg_host, pg_port, pg_db, year, month, target_table, chunksize):
-    """Ingest NYC taxi data into PostgreSQL database."""
+def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table, chunksize):
+    """Ingest NYC taxi zone lookup data into PostgreSQL database."""
     
     # 1. Setup Source and Destination
-    prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow'
-    url = f'{prefix}/yellow_tripdata_{year}-{month:02d}.csv.gz'
+    url = 'https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv'
     conn_string = f'postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}'
     engine = create_engine(conn_string)
 
     # 2. Initialize Data Stream
     df_iter = pd.read_csv(
         url,
-        dtype=dtype,
-        parse_dates=parse_dates,
         iterator=True,
         chunksize=chunksize,
     )
@@ -63,7 +32,7 @@ def run(pg_user, pg_pass, pg_host, pg_port, pg_db, year, month, target_table, ch
     first = True
 
     # 3. Batch Ingestion
-    for df_chunk in tqdm(df_iter, desc="Ingesting data"):
+    for df_chunk in tqdm(df_iter, desc="Ingesting zone data"):
         if first:
             # Create table structure (replace if exists)
             df_chunk.head(n=0).to_sql(

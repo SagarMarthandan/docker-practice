@@ -1,0 +1,37 @@
+[2026-06-15T14:10:18.267+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-06-15T14:10:18.323+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 03_getting_started_data_pipeline.store_in_postgres manual__2026-06-15T14:10:14+00:00 [queued]>
+[2026-06-15T14:10:18.336+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 03_getting_started_data_pipeline.store_in_postgres manual__2026-06-15T14:10:14+00:00 [queued]>
+[2026-06-15T14:10:18.336+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-06-15T14:10:18.360+0000] {taskinstance.py:2330} INFO - Executing <Task(_PythonDecoratedOperator): store_in_postgres> on 2026-06-15 14:10:14+00:00
+[2026-06-15T14:10:18.370+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '03_getting_started_data_pipeline', 'store_in_postgres', 'manual__2026-06-15T14:10:14+00:00', '--job-id', '8', '--raw', '--subdir', 'DAGS_FOLDER/dag_03_data_pipeline.py', '--cfg-path', '/tmp/tmpi25yd1qs']
+[2026-06-15T14:10:18.373+0000] {standard_task_runner.py:91} INFO - Job 8: Subtask store_in_postgres
+[2026-06-15T14:10:18.376+0000] {logging_mixin.py:188} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:62 DeprecationWarning: This process (pid=913) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-06-15T14:10:18.377+0000] {standard_task_runner.py:64} INFO - Started process 914 to run task
+[2026-06-15T14:10:18.465+0000] {task_command.py:426} INFO - Running <TaskInstance: 03_getting_started_data_pipeline.store_in_postgres manual__2026-06-15T14:10:14+00:00 [running]> on host b107edefa4b1
+[2026-06-15T14:10:18.654+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='03_getting_started_data_pipeline' AIRFLOW_CTX_TASK_ID='store_in_postgres' AIRFLOW_CTX_EXECUTION_DATE='2026-06-15T14:10:14+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-06-15T14:10:14+00:00'
+[2026-06-15T14:10:18.656+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-06-15T14:10:18.686+0000] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2026-06-15T14:10:18.687+0000] {base.py:84} INFO - Using connection ID 'postgres_zoomcamp' for task execution.
+[2026-06-15T14:10:18.708+0000] {sql.py:495} INFO - Running statement: CREATE TABLE IF NOT EXISTS products ("brand" VARCHAR(255), "price" VARCHAR(255));, parameters: None
+[2026-06-15T14:10:18.723+0000] {base.py:84} INFO - Using connection ID 'postgres_zoomcamp' for task execution.
+[2026-06-15T14:10:18.736+0000] {sql.py:495} INFO - Running statement: TRUNCATE TABLE products;, parameters: None
+[2026-06-15T14:10:18.743+0000] {base.py:84} INFO - Using connection ID 'postgres_zoomcamp' for task execution.
+[2026-06-15T14:10:18.755+0000] {base.py:84} INFO - Using connection ID 'postgres_zoomcamp' for task execution.
+[2026-06-15T14:10:18.769+0000] {sql.py:608} INFO - Loaded 30 rows into products so far
+[2026-06-15T14:10:18.769+0000] {sql.py:621} INFO - Done loading. Loaded a total of 30 rows into products
+[2026-06-15T14:10:18.770+0000] {logging_mixin.py:188} INFO - Successfully inserted 30 rows into Postgres 'products' table!
+[2026-06-15T14:10:18.771+0000] {base.py:84} INFO - Using connection ID 'postgres_zoomcamp' for task execution.
+[2026-06-15T14:10:18.784+0000] {sql.py:495} INFO - Running statement: SELECT * FROM products LIMIT 5;, parameters: None
+[2026-06-15T14:10:18.785+0000] {sql.py:504} INFO - Rows affected: 5
+[2026-06-15T14:10:18.787+0000] {logging_mixin.py:188} INFO - Postgres query result (first 5 rows):
+[2026-06-15T14:10:18.787+0000] {logging_mixin.py:188} INFO - ('Essence', '9.99')
+[2026-06-15T14:10:18.787+0000] {logging_mixin.py:188} INFO - ('Glamour Beauty', '19.99')
+[2026-06-15T14:10:18.787+0000] {logging_mixin.py:188} INFO - ('Velvet Touch', '14.99')
+[2026-06-15T14:10:18.788+0000] {logging_mixin.py:188} INFO - ('Chic Cosmetics', '12.99')
+[2026-06-15T14:10:18.788+0000] {logging_mixin.py:188} INFO - ('Nail Couture', '8.99')
+[2026-06-15T14:10:18.788+0000] {python.py:237} INFO - Done. Returned value was: None
+[2026-06-15T14:10:18.788+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-06-15T14:10:18.810+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=03_getting_started_data_pipeline, task_id=store_in_postgres, run_id=manual__2026-06-15T14:10:14+00:00, execution_date=20260615T141014, start_date=20260615T141018, end_date=20260615T141018
+[2026-06-15T14:10:18.839+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-06-15T14:10:18.873+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-06-15T14:10:18.876+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

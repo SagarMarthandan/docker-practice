@@ -1,5 +1,6 @@
 *.parquet
-
+.env
 __pychache__/
 *.py[codz]
 *$py.class
+data-engineering-zoomcamp/

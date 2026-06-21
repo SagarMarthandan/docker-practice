@@ -1,0 +1,21 @@
+[2026-06-15T14:31:20.296+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-06-15T14:31:20.400+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 04_postgres_taxi.extract manual__2026-06-15T14:31:19+00:00 [queued]>
+[2026-06-15T14:31:20.431+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 04_postgres_taxi.extract manual__2026-06-15T14:31:19+00:00 [queued]>
+[2026-06-15T14:31:20.432+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-06-15T14:31:20.480+0000] {taskinstance.py:2330} INFO - Executing <Task(_PythonDecoratedOperator): extract> on 2026-06-15 14:31:19+00:00
+[2026-06-15T14:31:20.499+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '04_postgres_taxi', 'extract', 'manual__2026-06-15T14:31:19+00:00', '--job-id', '28', '--raw', '--subdir', 'DAGS_FOLDER/dag_04_postgres_taxi.py', '--cfg-path', '/tmp/tmpji5qshx4']
+[2026-06-15T14:31:20.514+0000] {standard_task_runner.py:91} INFO - Job 28: Subtask extract
+[2026-06-15T14:31:20.519+0000] {logging_mixin.py:188} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:62 DeprecationWarning: This process (pid=1805) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-06-15T14:31:20.521+0000] {standard_task_runner.py:64} INFO - Started process 1808 to run task
+[2026-06-15T14:31:20.667+0000] {task_command.py:426} INFO - Running <TaskInstance: 04_postgres_taxi.extract manual__2026-06-15T14:31:19+00:00 [running]> on host b107edefa4b1
+[2026-06-15T14:31:20.929+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='04_postgres_taxi' AIRFLOW_CTX_TASK_ID='extract' AIRFLOW_CTX_EXECUTION_DATE='2026-06-15T14:31:19+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-06-15T14:31:19+00:00'
+[2026-06-15T14:31:20.931+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-06-15T14:31:20.933+0000] {logging_mixin.py:188} INFO - Downloading https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2021-01.csv.gz → /tmp/green_tripdata_2021-01.csv.gz
+[2026-06-15T14:31:21.466+0000] {logging_mixin.py:188} INFO - Decompressing /tmp/green_tripdata_2021-01.csv.gz → /tmp/green_tripdata_2021-01.csv
+[2026-06-15T14:31:21.504+0000] {logging_mixin.py:188} INFO - Downloaded 6,912,251 bytes uncompressed
+[2026-06-15T14:31:21.504+0000] {python.py:237} INFO - Done. Returned value was: /tmp/green_tripdata_2021-01.csv
+[2026-06-15T14:31:21.505+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-06-15T14:31:21.549+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=04_postgres_taxi, task_id=extract, run_id=manual__2026-06-15T14:31:19+00:00, execution_date=20260615T143119, start_date=20260615T143120, end_date=20260615T143121
+[2026-06-15T14:31:21.597+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-06-15T14:31:21.642+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-06-15T14:31:21.646+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

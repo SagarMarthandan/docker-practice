@@ -9,6 +9,8 @@ docker run -it --rm \
   postgres:18
 
 uv run pgcli -h localhost -p 5432 -u root -d ny_taxi
+uv run --with pgcli --with psycopg-binary pgcli -h localhost -p 5432 -u root -d ny_taxi
+
 
 uv run jupyter notebook
 

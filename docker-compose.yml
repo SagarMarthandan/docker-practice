@@ -1,33 +1,108 @@
+x-airflow-common: &airflow-common
+  # Updated to the official stable tag on the 2.9 release train
+  image: apache/airflow:2.9.3
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
+    AIRFLOW__CORE__TEST_CONNECTION: 'Enabled'
+    GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/keys/google_credentials.json
+    AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: '{"conn_type": "google_cloud_platform", "extra": {"project": "dtc-de-course-497317", "key_path": "/opt/airflow/keys/google_credentials.json"}}'
+    AIRFLOW_VAR_GCP_PROJECT_ID: "dtc-de-course-497317"
+    AIRFLOW_VAR_GCP_BUCKET_NAME: "dtc-de-course-497317-terra-bucket"
+    AIRFLOW_VAR_GCP_DATASET: "trips_data_all"
+    AIRFLOW_VAR_GCP_LOCATION: "EU"
+    _PIP_ADDITIONAL_REQUIREMENTS: >-
+      apache-airflow-providers-postgres
+      apache-airflow-providers-google
+      duckdb
+      requests
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - /tmp:/tmp
+    - /home/sagar/dtc-de-course/keys/google_credentials.json:/opt/airflow/keys/google_credentials.json:ro
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
 services:
-  pgdatabase:
+  # Upgraded database tier to PostgreSQL 18
+  postgres:
     image: postgres:18
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=ny_taxi
-    volumes:
-      - "ny_taxi_postgres_data:/var/lib/postgresql"
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root -d ny_taxi"]
+      test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
-      timeout: 5s
       retries: 5
 
+  # Embedded pgAdmin 4 v9.14 running on port 8081
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:9.14
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=root
-    volumes:
-      - "pgadmin_data:/var/lib/pgadmin"
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "8085:80"
+      - "8081:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
-      pgdatabase:
+      - postgres
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      postgres:
         condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    <<: *airflow-common
+    command:
+      - bash
+      - -c
+      - |
+        airflow db migrate &&
+        airflow users create \
+          --username admin \
+          --firstname Admin \
+          --lastname User \
+          --role Admin \
+          --email admin@example.com \
+          --password admin
+    restart: on-failure
 
 volumes:
-  ny_taxi_postgres_data:
+  postgres_data:
   pgadmin_data:

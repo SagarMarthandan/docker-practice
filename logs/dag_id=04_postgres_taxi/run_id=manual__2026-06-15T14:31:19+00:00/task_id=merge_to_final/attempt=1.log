@@ -1,0 +1,31 @@
+[2026-06-15T14:31:24.436+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-06-15T14:31:24.495+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 04_postgres_taxi.merge_to_final manual__2026-06-15T14:31:19+00:00 [queued]>
+[2026-06-15T14:31:24.512+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 04_postgres_taxi.merge_to_final manual__2026-06-15T14:31:19+00:00 [queued]>
+[2026-06-15T14:31:24.512+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-06-15T14:31:24.532+0000] {taskinstance.py:2330} INFO - Executing <Task(_PythonDecoratedOperator): merge_to_final> on 2026-06-15 14:31:19+00:00
+[2026-06-15T14:31:24.544+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '04_postgres_taxi', 'merge_to_final', 'manual__2026-06-15T14:31:19+00:00', '--job-id', '30', '--raw', '--subdir', 'DAGS_FOLDER/dag_04_postgres_taxi.py', '--cfg-path', '/tmp/tmprzh69x8o']
+[2026-06-15T14:31:24.548+0000] {standard_task_runner.py:91} INFO - Job 30: Subtask merge_to_final
+[2026-06-15T14:31:24.548+0000] {logging_mixin.py:188} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:62 DeprecationWarning: This process (pid=1811) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-06-15T14:31:24.549+0000] {standard_task_runner.py:64} INFO - Started process 1812 to run task
+[2026-06-15T14:31:24.644+0000] {task_command.py:426} INFO - Running <TaskInstance: 04_postgres_taxi.merge_to_final manual__2026-06-15T14:31:19+00:00 [running]> on host b107edefa4b1
+[2026-06-15T14:31:24.799+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='04_postgres_taxi' AIRFLOW_CTX_TASK_ID='merge_to_final' AIRFLOW_CTX_EXECUTION_DATE='2026-06-15T14:31:19+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-06-15T14:31:19+00:00'
+[2026-06-15T14:31:24.800+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-06-15T14:31:24.802+0000] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2026-06-15T14:31:24.803+0000] {base.py:84} INFO - Using connection ID 'postgres_zoomcamp' for task execution.
+[2026-06-15T14:31:24.816+0000] {sql.py:495} INFO - Running statement: 
+            INSERT INTO public.green_tripdata ("unique_row_id", "filename", "VendorID", "lpep_pickup_datetime", "lpep_dropoff_datetime", "store_and_fwd_flag", "RatecodeID", "PULocationID", "DOLocationID", "passenger_count", "trip_distance", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "ehail_fee", "improvement_surcharge", "total_amount", "payment_type", "trip_type", "congestion_surcharge")
+            SELECT S."unique_row_id", S."filename", S."VendorID", S."lpep_pickup_datetime", S."lpep_dropoff_datetime", S."store_and_fwd_flag", S."RatecodeID", S."PULocationID", S."DOLocationID", S."passenger_count", S."trip_distance", S."fare_amount", S."extra", S."mta_tax", S."tip_amount", S."tolls_amount", S."ehail_fee", S."improvement_surcharge", S."total_amount", S."payment_type", S."trip_type", S."congestion_surcharge"
+            FROM   public.green_tripdata_staging S
+            WHERE  NOT EXISTS (
+                SELECT 1 FROM public.green_tripdata T
+                WHERE  T.unique_row_id = S.unique_row_id
+            );
+        , parameters: None
+[2026-06-15T14:31:25.061+0000] {sql.py:504} INFO - Rows affected: 76518
+[2026-06-15T14:31:25.077+0000] {logging_mixin.py:188} INFO - Merge complete → public.green_tripdata
+[2026-06-15T14:31:25.078+0000] {python.py:237} INFO - Done. Returned value was: None
+[2026-06-15T14:31:25.078+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-06-15T14:31:25.096+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=04_postgres_taxi, task_id=merge_to_final, run_id=manual__2026-06-15T14:31:19+00:00, execution_date=20260615T143119, start_date=20260615T143124, end_date=20260615T143125
+[2026-06-15T14:31:25.133+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-06-15T14:31:25.171+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-06-15T14:31:25.174+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

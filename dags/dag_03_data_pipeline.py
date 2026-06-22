@@ -1,6 +1,9 @@
 from airflow.decorators import dag, task
 from airflow.models.param import Param
 from datetime import datetime
+import logging
+
+log = logging.getLogger(__name__)
 
 @dag(
     dag_id="03_getting_started_data_pipeline",
@@ -46,8 +49,7 @@ def data_pipeline():
         from airflow.providers.postgres.hooks.postgres import PostgresHook
 
         if not filtered_data:
-            print("No data to store.")
-            return
+            raise ValueError("No data to store — upstream extract or transform returned empty results")
 
         # Dynamically set Postgres connection pointing to the zoomcamp database
         os.environ["AIRFLOW_CONN_POSTGRES_ZOOMCAMP"] = "postgresql://airflow:airflow@postgres:5432/zoomcamp"

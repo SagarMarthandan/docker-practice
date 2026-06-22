@@ -4,7 +4,16 @@ import pandas as pd
 
 print("arguments", sys.argv)
 
-day = int(sys.argv[1])
+if len(sys.argv) < 2:
+    print("Usage: pipeline.py <day>", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    day = int(sys.argv[1])
+except ValueError:
+    print(f"Error: '{sys.argv[1]}' is not a valid integer for day", file=sys.stderr)
+    sys.exit(1)
+
 print(f"Running pipeline for day {day}")
 
 

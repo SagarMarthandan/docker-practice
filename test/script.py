@@ -12,5 +12,9 @@ for filepath in current_dir.iterdir():
     print(f"  - {filepath.name}")
 
     if filepath.is_file():
-        content = filepath.read_text(encoding='utf-8')
+        try:
+            content = filepath.read_text(encoding='utf-8')
+        except (UnicodeDecodeError, PermissionError, OSError) as exc:
+            print(f"    Could not read: {exc}")
+            continue
         print(f"    Content: {content}")

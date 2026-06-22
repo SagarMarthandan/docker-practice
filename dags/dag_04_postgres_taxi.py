@@ -2,7 +2,10 @@ from airflow.decorators import dag, task
 from airflow.models.param import Param
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime
+import logging
 import os
+
+log = logging.getLogger(__name__)
 
 # Dynamically set Postgres connection pointing to the zoomcamp database
 os.environ["AIRFLOW_CONN_POSTGRES_ZOOMCAMP"] = "postgresql://airflow:airflow@postgres:5432/zoomcamp"
@@ -141,38 +144,43 @@ def postgres_taxi():
         conn = hook.get_conn()
         cur  = conn.cursor()
 
-        # 1. Truncate staging
-        cur.execute(f"TRUNCATE TABLE public.{taxi}_tripdata_staging;")
+        try:
+            # 1. Truncate staging
+            cur.execute(f"TRUNCATE TABLE public.{taxi}_tripdata_staging;")
 
-        # 2. COPY CSV into staging (Kestra uses Kestra's own COPY task; we use psycopg2)
-        col_list = ", ".join(f'"{c}"' for c in columns)
-        with open(file_path, "r") as f:
-            copy_sql = (
-                f"COPY public.{taxi}_tripdata_staging ({col_list}) "
-                f"FROM STDIN WITH CSV HEADER"
-            )
-            cur.copy_expert(copy_sql, f)
+            # 2. COPY CSV into staging
+            col_list = ", ".join(f'"{c}"' for c in columns)
+            with open(file_path, "r") as f:
+                copy_sql = (
+                    f"COPY public.{taxi}_tripdata_staging ({col_list}) "
+                    f"FROM STDIN WITH CSV HEADER"
+                )
+                cur.copy_expert(copy_sql, f)
 
-        row_count = cur.rowcount
-        print(f"Loaded {row_count:,} rows into staging")
+            row_count = cur.rowcount
+            log.info("Loaded %s rows into staging", f"{row_count:,}")
 
-        # 3. Add unique_row_id (MD5 of key fields — same as Kestra's UPDATE)
-        dedup_cols = YELLOW_DEDUP_COLS if taxi == "yellow" else GREEN_DEDUP_COLS
-        md5_expr = "||".join(f"COALESCE(\"{c}\"::TEXT, '')" for c in dedup_cols)
-        cur.execute(f"""
-            UPDATE public.{taxi}_tripdata_staging
-            SET unique_row_id = md5({md5_expr});
-        """)
+            # 3. Add unique_row_id (MD5 of key fields)
+            dedup_cols = YELLOW_DEDUP_COLS if taxi == "yellow" else GREEN_DEDUP_COLS
+            md5_expr = "||".join(f"COALESCE(\"{c}\"::TEXT, '')" for c in dedup_cols)
+            cur.execute(f"""
+                UPDATE public.{taxi}_tripdata_staging
+                SET unique_row_id = md5({md5_expr});
+            """)
 
-        # 4. Add filename tag
-        cur.execute(f"""
-            UPDATE public.{taxi}_tripdata_staging
-            SET filename = '{filename}';
-        """)
+            # 4. Add filename tag
+            cur.execute(f"""
+                UPDATE public.{taxi}_tripdata_staging
+                SET filename = '{filename}';
+            """)
 
-        conn.commit()
-        cur.close()
-        conn.close()
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            cur.close()
+            conn.close()
 
     @task
     def merge_to_final(**context):
@@ -202,7 +210,9 @@ def postgres_taxi():
         """Kestra: purgeOutputs — remove temp file"""
         if os.path.exists(file_path):
             os.remove(file_path)
-            print(f"Cleaned up: {file_path}")
+            log.info("Cleaned up: %s", file_path)
+        else:
+            log.warning("Expected temp file not found, may indicate an upstream issue: %s", file_path)
 
     # ── Wire tasks ──────────────────────────────────────────────────────────
     path = extract()

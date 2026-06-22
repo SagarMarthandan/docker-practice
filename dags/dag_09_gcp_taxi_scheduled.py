@@ -25,6 +25,8 @@ def gcp_taxi_scheduled():
         import shutil
 
         taxi = context["params"]["taxi"]
+        if taxi not in ("yellow", "green"):
+            raise ValueError(f"Invalid taxi type: {taxi!r}")
         # Derive year/month from the scheduling window
         logical_date = context["data_interval_start"]
         year  = logical_date.strftime("%Y")

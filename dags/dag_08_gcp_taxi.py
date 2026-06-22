@@ -30,6 +30,13 @@ def gcp_taxi():
         year  = context["params"]["year"]
         month = context["params"]["month"]
 
+        if taxi not in ("yellow", "green"):
+            raise ValueError(f"Invalid taxi type: {taxi!r}")
+        if not (year.isdigit() and len(year) == 4):
+            raise ValueError(f"Invalid year: {year!r}")
+        if not (month.isdigit() and 1 <= int(month) <= 12):
+            raise ValueError(f"Invalid month: {month!r}")
+
         filename = f"{taxi}_tripdata_{year}-{month}.csv"
         url = (
             f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download"

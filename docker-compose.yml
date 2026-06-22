@@ -7,8 +7,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
-    AIRFLOW__CORE__TEST_CONNECTION: 'Enabled'
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'false'
+    AIRFLOW__CORE__TEST_CONNECTION: 'Disabled'
     GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/keys/google_credentials.json
     AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: '{"conn_type": "google_cloud_platform", "extra": {"project": "dtc-de-course-497317", "key_path": "/opt/airflow/keys/google_credentials.json"}}'
     AIRFLOW_VAR_GCP_PROJECT_ID: "dtc-de-course-497317"
@@ -24,7 +24,6 @@ x-airflow-common: &airflow-common
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - /tmp:/tmp
     - /home/sagar/dtc-de-course/keys/google_credentials.json:/opt/airflow/keys/google_credentials.json:ro
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:

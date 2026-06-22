@@ -21,16 +21,25 @@ def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table, chunksize):
     # 1. Setup Source and Destination
     url = 'https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv'
     conn_string = f'postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}'
-    engine = create_engine(conn_string)
+
+    try:
+        engine = create_engine(conn_string)
+        engine.connect().close()
+    except Exception as exc:
+        raise click.ClickException(f"Cannot connect to PostgreSQL at {pg_host}:{pg_port}/{pg_db}: {exc}") from exc
 
     # 2. Initialize Data Stream
-    df_iter = pd.read_csv(
-        url,
-        iterator=True,
-        chunksize=chunksize,
-    )
+    try:
+        df_iter = pd.read_csv(
+            url,
+            iterator=True,
+            chunksize=chunksize,
+        )
+    except Exception as exc:
+        raise click.ClickException(f"Failed to read CSV from {url}: {exc}") from exc
 
     first = True
+    ingested_chunks = 0
 
     # 3. Batch Ingestion
     for df_chunk in tqdm(df_iter, desc="Ingesting zone data"):
@@ -48,6 +57,10 @@ def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table, chunksize):
             con=engine,
             if_exists='append'
         )
+        ingested_chunks += 1
+
+    if ingested_chunks == 0:
+        raise click.ClickException(f"No data found at {url}")
 
 if __name__ == '__main__':
     run()

@@ -2,7 +2,10 @@ from airflow.decorators import dag, task
 from airflow.models import Variable
 from airflow.models.param import Param
 from datetime import datetime
+import logging
 import os
+
+log = logging.getLogger(__name__)
 
 @dag(
     dag_id="09_gcp_taxi_scheduled",
@@ -188,7 +191,9 @@ def gcp_taxi_scheduled():
     def purge_file(file_path: str):
         if os.path.exists(file_path):
             os.remove(file_path)
-            print(f"Cleaned up: {file_path}")
+            log.info("Cleaned up: %s", file_path)
+        else:
+            log.warning("Expected temp file not found, may indicate an upstream issue: %s", file_path)
 
     # ── Wire tasks ──────────────────────────────────────────────────────────
     path     = extract()

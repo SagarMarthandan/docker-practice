@@ -62,6 +62,8 @@ def postgres_taxi_scheduled():
         import shutil
 
         taxi = context["params"]["taxi"]
+        if taxi not in ("yellow", "green"):
+            raise ValueError(f"Invalid taxi type: {taxi!r}")
         # Airflow: data_interval_start gives the logical execution date
         logical_date = context["data_interval_start"]
         year  = logical_date.strftime("%Y")

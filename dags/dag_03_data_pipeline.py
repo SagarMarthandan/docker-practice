@@ -43,6 +43,7 @@ def data_pipeline():
     def store_in_postgres(filtered_data: list):
         """Stores the transformed data in the PostgreSQL database."""
         import os
+        import re
         from airflow.providers.postgres.hooks.postgres import PostgresHook
 
         if not filtered_data:
@@ -54,8 +55,13 @@ def data_pipeline():
         
         pg_hook = PostgresHook(postgres_conn_id="postgres_zoomcamp")
 
-        # Get dynamic columns based on data keys
+        # Get dynamic columns based on data keys and validate them
         columns = list(filtered_data[0].keys())
+        identifier_re = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+        for col in columns:
+            if not identifier_re.match(col):
+                raise ValueError(f"Invalid column name rejected: {col!r}")
+
         columns_sql = ", ".join([f'"{col}" VARCHAR(255)' for col in columns])
 
         # Drop and recreate table to ensure schema updates if columns change

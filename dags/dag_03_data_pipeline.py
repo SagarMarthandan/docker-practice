@@ -42,16 +42,15 @@ def data_pipeline():
     @task
     def store_in_postgres(filtered_data: list):
         """Stores the transformed data in the PostgreSQL database."""
-        import os
         from airflow.providers.postgres.hooks.postgres import PostgresHook
+        from shared.taxi_schema import setup_postgres_conn
 
         if not filtered_data:
             print("No data to store.")
             return
 
-        # Dynamically set Postgres connection pointing to the zoomcamp database
-        os.environ["AIRFLOW_CONN_POSTGRES_ZOOMCAMP"] = "postgresql://airflow:airflow@postgres:5432/zoomcamp"
-        
+        setup_postgres_conn()
+
         pg_hook = PostgresHook(postgres_conn_id="postgres_zoomcamp")
 
         # Get dynamic columns based on data keys

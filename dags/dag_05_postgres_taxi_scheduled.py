@@ -43,6 +43,7 @@ def _col_definitions(columns: list[str]) -> str:
 @dag(
     dag_id="05_postgres_taxi_scheduled",
     start_date=datetime(2019, 1, 1),   # set to earliest data you want to backfill from
+    end_date=datetime(2021, 8, 1),
     schedule="0 9 1 * *",             # Kestra: schedule: cron: "0 9 1 * *"
     max_active_runs=1,                # Kestra: concurrency: limit: 1
     catchup=True,                     # enables backfill — runs for all past intervals

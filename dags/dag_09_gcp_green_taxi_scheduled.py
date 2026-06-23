@@ -5,18 +5,18 @@ from datetime import datetime
 import os
 
 @dag(
-    dag_id="09_gcp_taxi_scheduled",
+    dag_id="09_gcp_green_taxi_scheduled",
     start_date=datetime(2019, 1, 1),   # earliest backfill date
     end_date=datetime(2021, 8, 1),
     schedule="0 9 1 * *",
     max_active_runs=1,
     catchup=True,                      # allows backfilling past months
-    tags=["zoomcamp", "gcp", "scheduled"],
+    tags=["zoomcamp", "gcp", "scheduled", "green"],
     params={
-        "taxi": Param("yellow", enum=["yellow", "green"]),
+        "taxi": Param("green", enum=["yellow", "green"]),
     },
 )
-def gcp_taxi_scheduled():
+def gcp_green_taxi_scheduled():
 
     @task
     def extract(**context) -> str:
@@ -203,4 +203,4 @@ def gcp_taxi_scheduled():
     # 2. purge_file must only run after loading is complete
     bq_table >> load >> purge
 
-gcp_taxi_scheduled()
+gcp_green_taxi_scheduled()
